@@ -12,6 +12,10 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    password: {
+        type: String,
+        required: true,
+    },
     role: {
         type: String,
         default: "user"
@@ -29,7 +33,7 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10)
 })
 
-userSchema.methods.comparePassword = async (enterPass) => {
+userSchema.methods.comparePassword = async function (enterPass) {
     try {
         const result = bcrypt.compareSync(String(enterPass), this.password);
         return result;
@@ -38,7 +42,7 @@ userSchema.methods.comparePassword = async (enterPass) => {
     }
 }
 
-userSchema.methods.getJwtToken = async () => {
+userSchema.methods.getJwtToken = function () {
     const token = jwt.sign({ id: this._id }, process.env.jwt_secret, {
         expiresIn: process.env.jwt_expires_time
     })
