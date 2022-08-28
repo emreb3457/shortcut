@@ -1,16 +1,16 @@
 import { Box, list, Text } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 const LocationList = ({ listitem, select }) => {
 
     const [active, setActive] = useState("");
 
     return (
-        <Box>
+        <Box maxH={"90vh"} overflow="scroll" overflowX={"hidden"} >
             {listitem?.map((item, index) =>
-                <Box key={index} cursor="pointer" onClick={() => { select([item.lng, item.lat]); setActive(item) }} borderBottom="1px solid black" bg={active == item ? "#a8df80b8" : "#f4f4f4bf"} p="20px">
-                    <Text>{item?.name}</Text>
-                </Box>
+                    <Box key={index} cursor="pointer" onClick={() => { select(item); setActive(item) }} borderBottom="1px solid black" bg={active == item ? "#a8df80b8" : "#f4f4f4bf"} p="20px">
+                        <Text>{item?.name}</Text>
+                    </Box>
             )
             }
 

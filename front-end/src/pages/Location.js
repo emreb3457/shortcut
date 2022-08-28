@@ -11,7 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { getLocation } from '../actions/locationActions';
 import LocationList from '../comp/LocationList';
-
+import JsPDF from 'jspdf';
+import ReactDOM from 'react-dom/client';
 mapboxgl.accessToken = 'pk.eyJ1IjoiZW1yZWIzNDU3IiwiYSI6ImNsMWRxempvZjAzeDAzY21pbXNqZ3E3cXEifQ.ld1sORUZRV4AljBUVVnYMg';
 const styles = {
     width: "100%",
@@ -26,6 +27,7 @@ const LocationAdmin = () => {
     const [map, setMap] = useState(null);
     const [lastCord, setLastCords] = useState(null);
     const [selectCord, setSelectCord] = useState(null);
+    const [activeList, setActiveList] = useState(false);
     const mapContainer = useRef(null);
     const { latitude, longitude, error } = usePosition();
     const start = [longitude, latitude];
@@ -35,56 +37,70 @@ const LocationAdmin = () => {
             dispatch(getLocation());
         }
         if (selectCord) {
-            routeCalculation({ coords: selectCord, map })
+            let x = map;
+            if (!map) {
+                x = initializeMap({ setMap, mapContainer });
+                setMap(x)
+            }
+            routeCalculation({ coords: [selectCord.lng, selectCord.lat], map: x })
         }
     }, [selectCord])
 
     useEffect(() => {
         if (latitude) {
-            const initializeMap = ({ setMap, mapContainer }) => {
-                const map = new mapboxgl.Map({
-                    container: mapContainer.current,
-                    style: "mapbox://styles/mapbox/streets-v11",
-                    center: start,
-                    zoom: 12
-                });
-
-                map.addControl(
-                    new mapboxgl.GeolocateControl({
-                        positionOptions: {
-                            enableHighAccuracy: true,
-                        },
-                        trackUserLocation: true,
-                        style: {
-                            right: 10,
-                            top: 10
-                        },
-                        position: 'bottom-left',
-
-                        showUserHeading: true
-                    })
-                );
-
-                map.on("load", () => {
-                    setMap(map);
-                    map.resize();
-                    myLocationLayer({ map });
-                    // List Locations
-                    addTargetLayer({ map });
-                });
-                {
-                    sessionuser.user.role == "admin" &&
-                        map.on('click', async (event) => {
-                            const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
-                            selectLayer({ map, coords });
-                            routeCalculation({ map, coords })
-                        });
-                }
-            };
-
-            if (!map) initializeMap({ setMap, mapContainer });
+            if (!map) initializeMap({ mapContainer });
         }
     }, [map, latitude, locations]);
+
+    const print = () => {
+        const pdf = new JsPDF('portrait', 'pt', 'a4');
+        pdf.html(document.getElementById("instructions")).then(() => {
+            pdf.save(`${selectCord.name}.pdf`);
+        });
+    }
+
+    const initializeMap = ({ mapContainer }) => {
+        const map = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: "mapbox://styles/mapbox/streets-v11",
+            center: start,
+            zoom: 12
+        });
+
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true,
+                },
+                trackUserLocation: true,
+                style: {
+                    right: 10,
+                    top: 10
+                },
+                position: 'bottom-left',
+
+                showUserHeading: true
+            })
+        );
+
+        map.on("load", () => {
+            map.resize();
+            myLocationLayer({ map });
+            // List Locations
+            addTargetLayer({ map });
+            setActiveList(true);
+        });
+
+        {
+            sessionuser.user.role == "admin" &&
+                map.on('click', async (event) => {
+                    const coords = Object.keys(event.lngLat).map((key) => event.lngLat[key]);
+                    selectLayer({ map, coords });
+                    routeCalculation({ map, coords })
+                });
+        }
+        return map
+    };
 
     const myLocationLayer = ({ map }) => {
         map.addLayer({
@@ -139,7 +155,6 @@ const LocationAdmin = () => {
                     'circle-color': '#f30'
                 }
             });
-            // routeCalculation({ coords: [x.lng, x.lat], map })
         })
 
     }
@@ -206,11 +221,9 @@ const LocationAdmin = () => {
                 coordinates: route
             }
         };
-        // if the route already exists on the map, we'll reset it using setData
         if (map.getSource('route')) {
             map.getSource('route').setData(geojson);
         }
-        // otherwise, we'll make a new request
         else {
             map.addLayer({
                 id: 'route',
@@ -233,10 +246,13 @@ const LocationAdmin = () => {
         const instructions = document.getElementById('instructions');
         const steps = data.legs[0].steps;
         let tripInstructions = '';
+        for (const step of steps) {
+            tripInstructions += `<li>${step.maneuver.instruction}</li>`;
+        }
         instructions.innerHTML = `<p><strong> Distance: ${(data.distance / 1000).toFixed(1)}  KM</p></strong>
             <strong>Trip duration: ${Math.floor(
             data.duration / 60
-        )} min 🚗 </strong></p><ol>${tripInstructions}</ol>`;
+        )} min 🚗 </strong></p></br><ol>${tripInstructions}</ol>`;
     }
 
     const logout = () => {
@@ -245,12 +261,17 @@ const LocationAdmin = () => {
     }
 
     return (
-        <Box display={"flex"} flexDir={["column", "column", "column", "row"]}>
+        <Box display={"flex"} flexDir={["column", "column", "column", "row"]} id="map">
             <Box ref={el => (mapContainer.current = el)} style={styles} />
             <Box id="instructions" className="instructions"></Box>
             <Box minW="20%">
-                <Box textAlign={"end"} margin="20px" marginRight={"30px"}>
-                    <Button onClick={() => logout()} color={"white"} bg="red.400" _hover={{ bg: "red.600" }}>LOGOUT</Button>
+                <Box display={"flex"} justifyContent="end">
+                    <Box textAlign={"end"} mt="20px" >
+                        <Button onClick={() => { print() }} disabled={!selectCord && true} color={"white"} bg="blue.400" _hover={{ bg: "blue.600" }}>SAVE PDF</Button>
+                    </Box>
+                    <Box textAlign={"end"} margin="20px">
+                        <Button onClick={() => logout()} color={"white"} bg="red.400" _hover={{ bg: "red.600" }}>LOGOUT</Button>
+                    </Box>
                 </Box>
                 {
                     sessionuser.user.role == "admin" ?
@@ -259,12 +280,13 @@ const LocationAdmin = () => {
                             <AddLocationForm location={lastCord} maxW="70%" />
                         </Fragment>
                         :
-                        <Box mt="50px">
+                        <Box mt="50px" pointerEvents={!activeList && "none"}>
                             <LocationList listitem={locations?.result?.locations} select={setSelectCord} />
                         </Box>
                 }
+
             </Box>
-        </Box>
+        </Box >
     )
 };
 
