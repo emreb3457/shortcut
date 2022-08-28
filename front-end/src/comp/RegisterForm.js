@@ -1,6 +1,6 @@
 import { Box, Input, Button, Text } from "@chakra-ui/react"
 import { Fragment, useEffect, useState } from "react"
-import { createUser } from "../actions/userActions";
+import { createUser, getUsers } from "../actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"
 const RegisterForm = ({ otheruser, ...props }) => {
@@ -14,7 +14,7 @@ const RegisterForm = ({ otheruser, ...props }) => {
 
     useEffect(() => {
         if (success) {
-            navigation("/location")
+            dispatch(getUsers());
             dispatch({ type: "CLEAR_SUCCESS" })
         }
     }, [success])

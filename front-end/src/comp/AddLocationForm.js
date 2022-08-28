@@ -15,11 +15,9 @@ const AddLocationForm = ({ location, ...props }) => {
     const [errors, setErrors] = useState();
 
     const sessionuser = JSON.parse(sessionStorage.getItem("sessionUser"))
-
+    
     useEffect(() => {
-        if (!user?.result) {
-            dispatch(getUsers());
-        }
+        dispatch(getUsers());
     }, [location])
 
     const onSubmit = async () => {

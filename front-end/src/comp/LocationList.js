@@ -8,7 +8,7 @@ const LocationList = ({ listitem, select }) => {
     return (
         <Box maxH={"90vh"} overflow="scroll" overflowX={"hidden"} >
             {listitem?.map((item, index) =>
-                    <Box key={index} cursor="pointer" onClick={() => { select(item); setActive(item) }} borderBottom="1px solid black" bg={active == item ? "#a8df80b8" : "#f4f4f4bf"} p="20px">
+                    <Box key={index} cursor="pointer" onClick={() => { select(item); setActive(item) }} borderBottom="1px solid #d0cdcd" bg={active == item ? "#a8df80b8" : "#f4f4f4bf"} p="20px">
                         <Text>{item?.name}</Text>
                     </Box>
             )

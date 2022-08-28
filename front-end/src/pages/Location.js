@@ -24,6 +24,7 @@ const LocationAdmin = () => {
     const navigation = useNavigate();
     const dispatch = useDispatch();
     const { locations } = useSelector(state => state.location);
+    const { success } = useSelector(state => state.auth);
     const [map, setMap] = useState(null);
     const [lastCord, setLastCords] = useState(null);
     const [selectCord, setSelectCord] = useState(null);
@@ -50,7 +51,7 @@ const LocationAdmin = () => {
         if (latitude) {
             if (!map) initializeMap({ mapContainer });
         }
-    }, [map, latitude, locations]);
+    }, [map, latitude, locations, success]);
 
     const print = () => {
         const pdf = new JsPDF('portrait', 'pt', 'a4');
@@ -266,9 +267,12 @@ const LocationAdmin = () => {
             <Box id="instructions" className="instructions"></Box>
             <Box minW="20%">
                 <Box display={"flex"} justifyContent="end">
-                    <Box textAlign={"end"} mt="20px" >
-                        <Button onClick={() => { print() }} disabled={!selectCord && true} color={"white"} bg="blue.400" _hover={{ bg: "blue.600" }}>SAVE PDF</Button>
-                    </Box>
+                    {
+                        sessionuser.user.role !== "admin" &&
+                        <Box textAlign={"end"} mt="20px" >
+                            <Button onClick={() => { print() }} disabled={!selectCord && true} color={"white"} bg="blue.400" _hover={{ bg: "blue.600" }}>SAVE PDF</Button>
+                        </Box>
+                    }
                     <Box textAlign={"end"} margin="20px">
                         <Button onClick={() => logout()} color={"white"} bg="red.400" _hover={{ bg: "red.600" }}>LOGOUT</Button>
                     </Box>

@@ -16,16 +16,6 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <ChakraProvider>
-        <ToastContainer
-          autoClose={5000}
-          hideProgressBar={true}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
         <App />
         <ToastContainer />
       </ChakraProvider>

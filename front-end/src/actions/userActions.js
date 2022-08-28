@@ -26,8 +26,6 @@ export const createUser = ({ name, email, password }) => async (dispatch) => {
             type: "CREATET_USER_SUCCESS",
             payload: data
         })
-        sessionStorage.setItem("sessionUser", JSON.stringify(data.result));
-        sessionStorage.setItem('acctoken', data.result.token);
         toast.success("Success.")
     } catch (error) {
         dispatch({
