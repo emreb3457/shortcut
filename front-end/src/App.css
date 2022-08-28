@@ -12,6 +12,6 @@
   color: white;
   max-width: 300px;
   max-height: 90vh;
-  overflow: scroll;
+  overflow: auto;
   overflow-x: hidden;
 }
