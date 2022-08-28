@@ -5,12 +5,19 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../actions/userActions";
 import LoginForm from "../comp/LoginForm";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user, loading } = useSelector(state => state.auth);
     const [loginBtn, setLoginBtn] = useState(false);
     useEffect(() => {
-        dispatch(getUsers());
+        if (sessionStorage.getItem("acctoken")) {
+            navigate("/location")
+        }
+        else {
+            dispatch(getUsers());
+        }
     }, [])
     return (
         <Box >

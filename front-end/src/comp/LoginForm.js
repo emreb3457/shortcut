@@ -39,7 +39,7 @@ const LoginForm = () => {
         <Box maxW={["80%", " 60%", "30%"]} margin="auto" mt="50px" border="1px solid #f1e8e8" p="30px" borderRadius={"10px"} >
             <FormInput value={email} setValue={setEmail} placeholder="E-Mail Adress" error={err.email} />
             <FormInput value={password} setValue={setPassword} placeholder="Password" error={err.password} />
-            <Button onClick={() => onSubmit()} w="100%" color={"white"} bg="green.300" _hover={{ bg: "green.500" }} mt="10px">Login</Button>
+            <Button onClick={() => onSubmit()} w="100%" color={"white"} bg="green.400" _hover={{ bg: "green.600" }} mt="10px">Login</Button>
         </Box >
     )
 }

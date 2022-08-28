@@ -18,8 +18,8 @@ root.render(
       <ChakraProvider>
         <ToastContainer
           autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
+          hideProgressBar={true}
+          newestOnTop={true}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss

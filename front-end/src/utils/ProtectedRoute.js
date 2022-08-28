@@ -1,10 +1,11 @@
 import React, { Children, Component, Fragment } from "react"
 import { Route, Navigate } from 'react-router-dom'
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, isAdmin }) => {
 
-    const session = sessionStorage.getItem("acctoken")
-    if (!session) {
+    const sessionuser = JSON.parse(sessionStorage.getItem("sessionUser"))
+    
+    if (!sessionuser) {
         return <Navigate to="/" />
     }
     return children

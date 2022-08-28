@@ -16,6 +16,13 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    locations: [
+        {
+            name: String,
+            lng: Number,
+            lat: Number
+        }
+    ],
     role: {
         type: String,
         default: "user"

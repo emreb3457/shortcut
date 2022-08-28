@@ -26,6 +26,7 @@ export const createUser = ({ name, email, password }) => async (dispatch) => {
             type: "CREATET_USER_SUCCESS",
             payload: data
         })
+        sessionStorage.setItem("sessionUser", JSON.stringify(data.result));
         sessionStorage.setItem('acctoken', data.result.token);
         toast.success("Success.")
     } catch (error) {
@@ -38,6 +39,7 @@ export const createUser = ({ name, email, password }) => async (dispatch) => {
     }
 }
 
+
 export const loginUser = ({ email, password }) => async (dispatch) => {
     try {
         dispatch({ type: "LOGIN_USER_REQUEST" })
@@ -49,7 +51,6 @@ export const loginUser = ({ email, password }) => async (dispatch) => {
         })
         sessionStorage.setItem("sessionUser", JSON.stringify(data.result));
         sessionStorage.setItem('acctoken', data.result.token);
-        console.log( sessionStorage.getItem('acctoken'))
         toast.success("Success.")
     } catch (error) {
         dispatch({
@@ -59,3 +60,25 @@ export const loginUser = ({ email, password }) => async (dispatch) => {
         toast.error(error?.response?.data?.message)
     }
 }
+
+export const createOutherUser = ({ name, email, password }) => async (dispatch) => {
+    try {
+        dispatch({ type: "CREATE_USER_REQUEST" })
+
+        const { data } = await instance.post("/createuser", { name, email, password });
+        dispatch({
+            type: "CREATET_USER_SUCCESS",
+            payload: data
+        })
+        toast.success("Success.")
+    } catch (error) {
+        dispatch({
+            type: "CREATE_USER_ERROR",
+            payload: error
+        })
+
+        toast.error(error?.response?.data?.message)
+    }
+}
+
+

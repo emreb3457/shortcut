@@ -12,8 +12,9 @@ exports.isAuthUser = catchAsyncErrors(async (req, res, next) => {
         const token = bearer[1]
         const decoded = jwt.verify(token, process.env.jwt_secret)
         req.user = await User.findById(decoded.id);
-        next();
+        next()
     } catch (error) {
+        console.log(error)
         return res.status(500).send({ message: "Token is not valid", status: false }
         )
     }

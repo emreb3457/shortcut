@@ -48,3 +48,26 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
     sendToken(validuser, 200, res);
 });
+
+exports.setLocations = catchAsyncErrors(async (req, res, next) => {
+    const { id, lng, lat, name } = req.body;
+    const user = await User.findById(id);
+    if (!user) {
+        return res.status(404).send({ message: "User Not Found", status: false });
+    }
+    user.locations.push({ name, lng, lat });
+    user.save();
+    res.status(200).json({
+        success: true,
+    })
+});
+
+exports.getLocations = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.user;
+    const user = await User.findById(id);
+    const locations = user.locations
+    res.status(200).json({
+        success: true,
+        result: { locations }
+    })
+});
