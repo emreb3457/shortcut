@@ -6,10 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../actions/userActions";
 import LoginForm from "../comp/LoginForm";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+
 const Home = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { user, loading } = useSelector(state => state.auth);
+    const { user, loading, error, success } = useSelector(state => state.auth);
     const [loginBtn, setLoginBtn] = useState(false);
     useEffect(() => {
         if (sessionStorage.getItem("acctoken")) {
@@ -18,7 +20,18 @@ const Home = () => {
         else {
             dispatch(getUsers());
         }
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error?.response?.data?.message)
+            dispatch({ type: "CLEAR_ERROR" })
+        }
+        if (success) {
+            toast.success("Success.")
+            dispatch({ type: "CLEAR_SUCCESS" })
+        }
+    }, [error, success])
     return (
         <Box >
             <Box mt="100px" textAlign={"center"}>

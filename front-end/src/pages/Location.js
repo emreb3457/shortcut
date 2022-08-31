@@ -1,8 +1,7 @@
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions'
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css'
-import { usePosition } from "../comp/usePosition";
+import { usePosition } from "../hooks/usePosition";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Box, Button } from '@chakra-ui/react';
 import AddLocationForm from '../comp/AddLocationForm';
@@ -12,7 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getLocation } from '../actions/locationActions';
 import LocationList from '../comp/LocationList';
 import JsPDF from 'jspdf';
-import ReactDOM from 'react-dom/client';
+import { toast } from 'react-toastify';
+
 mapboxgl.accessToken = 'pk.eyJ1IjoiZW1yZWIzNDU3IiwiYSI6ImNsMWRxempvZjAzeDAzY21pbXNqZ3E3cXEifQ.ld1sORUZRV4AljBUVVnYMg';
 const styles = {
     width: "100%",
@@ -23,8 +23,8 @@ const LocationAdmin = () => {
     const sessionuser = JSON.parse(sessionStorage.getItem("sessionUser"));
     const navigation = useNavigate();
     const dispatch = useDispatch();
-    const { locations } = useSelector(state => state.location);
-    const { success } = useSelector(state => state.auth);
+    const { locations, error: locationError } = useSelector(state => state.location);
+    const { success, error: authError } = useSelector(state => state.auth);
     const [map, setMap] = useState(null);
     const [lastCord, setLastCords] = useState(null);
     const [selectCord, setSelectCord] = useState(null);
@@ -32,6 +32,17 @@ const LocationAdmin = () => {
     const mapContainer = useRef(null);
     const { latitude, longitude, error } = usePosition();
     const start = [longitude, latitude];
+    useEffect(() => {
+        if (locationError || authError) {
+            let error = locationError || authError
+            toast.error(error?.response?.data?.message)
+            dispatch({ type: "CLEAR_ERROR" })
+        }
+        if (success) {
+            toast.success("Success.")
+            dispatch({ type: "CLEAR_SUCCESS" })
+        }
+    }, [error, success])
 
     useEffect(() => {
         if (!locations) {
@@ -52,6 +63,7 @@ const LocationAdmin = () => {
             if (!map) initializeMap({ mapContainer });
         }
     }, [map, latitude, locations, success]);
+
 
     const print = () => {
         const pdf = new JsPDF('portrait', 'pt', 'a4');
@@ -265,7 +277,7 @@ const LocationAdmin = () => {
         <Box display={"flex"} flexDir={["column", "column", "column", "row"]} id="map">
             <Box ref={el => (mapContainer.current = el)} style={styles} />
             <Box id="instructions" className="instructions"></Box>
-            <Box minW="20%">
+            <Box minW="33%">
                 <Box display={"flex"} justifyContent="end">
                     {
                         sessionuser.user.role !== "admin" &&

@@ -1,42 +1,36 @@
-import { Box, Input, Button, Select, Text } from "@chakra-ui/react"
+import { Box, Button, Select, Text } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { setLocation } from "../actions/locationActions";
-import { FormInput } from "./RegisterForm";
+import FormInput from "../comp/FormInput"
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"
 import { getUsers } from "../actions/userActions";
 import { toast } from 'react-toastify';
+import { useValidate } from "../hooks/useValidate";
+
 const AddLocationForm = ({ location, ...props }) => {
     const dispatch = useDispatch();
-    const navigation = useNavigate();
     const { user } = useSelector(state => state.auth);
     const [name, setName] = useState("");
     const [selectUser, setUser] = useState("");
-    const [errors, setErrors] = useState();
+    const [formError, setFormError] = useState();
+    const { errors } = useValidate({ location, selectUser, user });
 
     const sessionuser = JSON.parse(sessionStorage.getItem("sessionUser"))
-    
+
     useEffect(() => {
         dispatch(getUsers());
     }, [location])
 
     const onSubmit = async () => {
-        const err = valid();
-        setErrors(err);
+        setFormError(errors)
+        const err = { ...errors };
         err.location && toast.error(err.location)
         if (Object.keys(err).length === 0) {
             dispatch(setLocation({ lng: location[0], lat: location[1], id: selectUser, name }));
         }
     }
-    const valid = () => {
-        const errors = {};
-        if (!location) errors.location = "Choose Location";
-        if (!selectUser) errors.selectUser = "Required";
-        if (!user) errors.user = "Required";
-        return errors;
-    }
 
-    const err = { ...errors };
+    const err = { ...formError };
     return (
         <Box maxW={["80% ", " 60% ", "30% "]} margin="auto" mt="50px" border="1px solid #f1e8e8" p="30px" borderRadius={"10px"} {...props} >
             < Text fontSize={"18px"} fontWeight="bold" mb="10px" > Add New Location</Text >

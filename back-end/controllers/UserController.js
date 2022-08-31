@@ -1,9 +1,12 @@
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const User = require("../models/User")
 const sendToken = require("../utils/sendToken")
+const status = require('http-status');
+const ErrorHandler = require("../utils/errorHandler");
+const authService = require("../services/auth.service")
+const locationService = require("../services/location.service")
 
 exports.getUsers = catchAsyncErrors(async (req, res, next) => {
-
     const users = await User.find();
     res.json({
         status: "true",
@@ -13,60 +16,28 @@ exports.getUsers = catchAsyncErrors(async (req, res, next) => {
 
 exports.createUser = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password } = req.body;
-
-    const user = await User.find();
-    const validuser = await User.findOne({ email });
-
-    if (validuser) {
-        return res.status(500).send({ message: "This email address is being used", status: false });
-    }
-    const newuser = await User.create({
-        name,
-        email,
-        password,
-        role: user.length !== 0 ? "user" : "admin"
-    });
+    const newuser = await authService.createUser(email, password, name);
     sendToken(newuser, 200, res);
 });
 
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(404).send({ message: "Please enter email & password", status: false });
-    }
-    const validuser = await User.findOne({ email }).select('+password');
-    if (!validuser) {
-        return res.status(401).send({ message: "Invalid Email or Password", status: false });
-    }
-
-    const passMatch = await validuser.comparePassword(password);
-
-    if (!passMatch) {
-        return res.status(401).send({ message: "Invalid Email or Password", status: false });
-    }
-
-    sendToken(validuser, 200, res);
+    const user = await authService.loginUserWithEmailAndPassword(email, password);
+    sendToken(user, status.OK, res);
 });
 
 exports.setLocations = catchAsyncErrors(async (req, res, next) => {
     const { id, lng, lat, name } = req.body;
-    const user = await User.findById(id);
-    if (!user) {
-        return res.status(404).send({ message: "User Not Found", status: false });
-    }
-    user.locations.push({ name, lng, lat });
-    user.save();
-    res.status(200).json({
+    await locationService.setLocations(id, lng, lat, name)
+    res.status(status.OK).json({
         success: true,
     })
 });
 
 exports.getLocations = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.user;
-    const user = await User.findById(id);
-    const locations = user.locations
-    res.status(200).json({
+    const locations = await locationService.getLocations(id)
+    res.status(status.OK).json({
         success: true,
         result: { locations }
     })

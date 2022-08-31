@@ -2,15 +2,16 @@ import { Box, Input, Button, Text } from "@chakra-ui/react"
 import { Fragment, useEffect, useState } from "react"
 import { createUser, getUsers } from "../actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"
+import { useValidate } from "../hooks/useValidate";
+import FormInput from "../comp/FormInput"
 const RegisterForm = ({ otheruser, ...props }) => {
-    const navigation = useNavigate();
     const dispatch = useDispatch();
     const { success } = useSelector(state => state.auth);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState();
+    const [formError, setFormError] = useState();
+    const { errors } = useValidate({ email, password, name });
 
     useEffect(() => {
         if (success) {
@@ -20,8 +21,8 @@ const RegisterForm = ({ otheruser, ...props }) => {
     }, [success])
 
     const onSubmit = () => {
-        const err = valid();
-        setErrors(err);
+        setFormError(errors)
+        const err = { ...errors };
         if (Object.keys(err).length === 0) {
             dispatch(createUser({ name, email, password }));
             setName("");
@@ -30,15 +31,8 @@ const RegisterForm = ({ otheruser, ...props }) => {
         }
     }
 
-    const valid = () => {
-        const errors = {};
-        if (!name) errors.name = "Required";
-        if (!email) errors.email = "Required";
-        if (!password) errors.password = "Required";
-        return errors;
-    }
+    const err = { ...formError };
 
-    const err = { ...errors };
     return (
         <Box maxW={["80%", " 60%", "40%"]} margin="auto" mt="50px" border="1px solid #f1e8e8" p="30px" borderRadius={"10px"}  {...props}>
             {otheruser && <Text fontSize={"18px"} fontWeight="bold" mb="10px">Add New User</Text>}
@@ -51,11 +45,3 @@ const RegisterForm = ({ otheruser, ...props }) => {
 }
 export default RegisterForm
 
-export const FormInput = ({ placeholder, value, setValue, error, type, ...props }) => {
-    return (
-        <Fragment>
-            <Input onChange={(x) => setValue(x.target.value)} value={value} placeholder={placeholder} type={type} my="5px" />
-            {error && <Text fontSize={"14px"} color="red" textAlign={"start"}>{error}</Text>}
-        </Fragment>
-    )
-}
