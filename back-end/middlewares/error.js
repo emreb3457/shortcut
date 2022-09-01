@@ -1,5 +1,6 @@
 const ErrorHandler = require('../utils/errorHandler');
 const status = require('http-status');
+const { intervalServer, castError, expiredToken, invalidToken } = require("../constants/errorMessages")
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     if (process.env.NODE_ENV === 'dev') {
@@ -20,7 +21,7 @@ module.exports = (err, req, res, next) => {
 
         // Wrong Mongoose Object ID Error
         if (err.name === 'CastError') {
-            const message = `Resource not found. Invalid: ${err.path}`
+            const message = `${castError}: ${err.path}`
             error = new ErrorHandler(message, status.BAD_REQUEST)
         }
 
@@ -38,19 +39,19 @@ module.exports = (err, req, res, next) => {
 
         // Handling wrong JWT error
         if (err.name === 'JsonWebTokenError') {
-            const message = 'JSON Web Token is invalid. Try Again!!!'
+            const message = invalidToken
             error = new ErrorHandler(message, status.BAD_REQUEST)
         }
 
         // Handling Expired JWT error
         if (err.name === 'TokenExpiredError') {
-            const message = 'JSON Web Token is expired. Try Again!!!'
+            const message = expiredToken
             error = new ErrorHandler(message, status.BAD_REQUEST)
         }
-        
-        res.status(error.statusCode || 500).send({
+
+        res.status(error.statusCode || status.INTERNAL_SERVER_ERROR).send({
             success: false,
-            message: error.message || 'Internal Server Error'
+            message: error.message || intervalServer
         })
     }
 }
