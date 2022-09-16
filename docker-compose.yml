@@ -3,34 +3,34 @@ services:
     build:
       context: ./back-end
       dockerfile: Dockerfile
-    image: myapp-server
+    image: registry.heroku.com/dockertest-2/server
     container_name: myapp-node-server
     command: npm run start
     volumes:
       - ./back-end/:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - "5000:5000"
-    depends_on:
-      - mongo
+      - "3001:3001"
+    # depends_on:
+    #   - mongo
     env_file: ./back-end/config/.env
     environment:
       - node_env=prod
     networks:
       - app-network
-  mongo:
-    image: mongo
-    volumes:
-      - data-volume:/data/db
-    ports:
-      - "27017:27017"
-    networks:
-      - app-network
+  # mongo:
+  #   image: mongo
+  #   volumes:
+  #     - data-volume:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - app-network
   client:
     build:
       context: ./front-end
       dockerfile: Dockerfile
-    image: myapp-client
+    image: registry.heroku.com/dockertest-2/web
     container_name: myapp-react-client
     command: npm start
     volumes:

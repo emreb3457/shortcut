@@ -15,4 +15,4 @@ process.on("unhandledRejection", (err) => {
 })
 
 const SERVER_PORT = process.env.port || process.env.PORT || 3001;
-app.listen(SERVER_PORT, () => console.log("Server started"))
+app.listen(SERVER_PORT, () => console.log("Server started"+" port "+SERVER_PORT))
