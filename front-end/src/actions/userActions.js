@@ -11,22 +11,27 @@ import {
     LOGIN_USER_SUCCESS
 } from "../constants/userConstants"
 
-export const getUsers = () => async (dispatch) => {
-    try {
-        dispatch({ type: GET_USER_REQUEST })
+export const getUsers = async(_) => {
+     const { data } = await instance.get("/getusers");
+     return data;
+  };
 
-        const { data } = await instance.get("/getusers");
-        dispatch({
-            type: GET_USER_SUCCESS,
-            payload: data
-        })
-    } catch (error) {
-        dispatch({
-            type: GET_USER_ERROR,
-            payload: error
-        })
-    }
-}
+// export const getUsers = () => async (dispatch) => {
+//     try {
+//         dispatch({ type: GET_USER_REQUEST })
+
+      
+//         dispatch({
+//             type: GET_USER_SUCCESS,
+//             payload: data
+//         })
+//     } catch (error) {
+//         dispatch({
+//             type: GET_USER_ERROR,
+//             payload: error
+//         })
+//     }
+// }
 
 export const createUser = ({ name, email, password }) => async (dispatch) => {
     try {
