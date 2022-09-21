@@ -1,7 +1,9 @@
 const app = require("./app")
-const database = require("./utils/database")
+const database = require("./utils/database");
+const redisConnect = require("./utils/redisConnect");
 
 database();
+redisConnect();
 
 process.on("uncaughtException", (err) => {
     console.log(`ERROR: ${err.stack}`);
@@ -15,4 +17,4 @@ process.on("unhandledRejection", (err) => {
 })
 
 const SERVER_PORT = process.env.port || process.env.PORT || 3001;
-app.listen(SERVER_PORT, () => console.log("Server started"+" port "+SERVER_PORT))
+app.listen(SERVER_PORT, () => console.log("Server started" + " port " + SERVER_PORT))

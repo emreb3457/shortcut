@@ -7,33 +7,16 @@ import { getUsers } from "../actions/userActions";
 import LoginForm from "../comp/LoginForm";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
-
+import useSwr from "swr"
 const Home = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { user, loading, error, success } = useSelector(state => state.auth);
+  
     const [loginBtn, setLoginBtn] = useState(false);
-    useEffect(() => {
-        if (sessionStorage.getItem("acctoken")) {
-            navigate("/location")
-        }
-        else {
-            dispatch(getUsers());
-        }
-    }, []);
 
-    useEffect(() => {
-        if (error) {
-            toast.error(error?.response?.data?.message)
-            dispatch({ type: "CLEAR_ERROR" })
-        }
-        if (success) {
-            toast.success("Success.")
-            dispatch({ type: "CLEAR_SUCCESS" })
-        }
-    }, [error, success])
+    const {data:user,error,mutate}=useSwr("getusers",getUsers);
+
     return (
         <Box >
+            {console.log("a")}
             <Box mt="100px" textAlign={"center"}>
                 <Img src={logo} margin="auto" boxShadow={"0px 6px 25px -6px rgba(0,0,0,0.67)"} />
                 {loginBtn ?
@@ -41,7 +24,7 @@ const Home = () => {
                         :
                         <RegisterForm />
                     :
-                    <Button onClick={() => setLoginBtn(true)} w="30%" color={"white"} bg="green.300" _hover={{ bg: "green.500" }} textTransform={"uppercase"} mt="100px" isLoading={loading} >Login</Button>
+                    <Button onClick={() => setLoginBtn(true)} w="30%" color={"white"} bg="green.300" _hover={{ bg: "green.500" }} textTransform={"uppercase"} mt="100px" isLoading={!user} >Login</Button>
                 }
             </Box>
         </Box>
