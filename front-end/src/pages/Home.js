@@ -12,11 +12,9 @@ const Home = () => {
   
     const [loginBtn, setLoginBtn] = useState(false);
 
-    const {data:user,error,mutate}=useSwr("getusers",getUsers);
-
+    const {data:user,error,mutate}=useSwr("getusers",getUsers,{revalidateOnFocus:false});
     return (
         <Box >
-            {console.log("a")}
             <Box mt="100px" textAlign={"center"}>
                 <Img src={logo} margin="auto" boxShadow={"0px 6px 25px -6px rgba(0,0,0,0.67)"} />
                 {loginBtn ?
