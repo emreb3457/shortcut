@@ -15,7 +15,6 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 
 
-
 //routes
 const userRoute = require("./routes/userRoute")
 

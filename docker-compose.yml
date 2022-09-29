@@ -1,4 +1,11 @@
 services:
+  nginx:
+     image: 'jc21/nginx-proxy-manager:2'
+     restart: unless-stopped
+     ports:
+      - '8080:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '8181:81' # Admin Web Port
   server:
     build:
       context: ./back-end

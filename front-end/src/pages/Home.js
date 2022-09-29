@@ -13,6 +13,8 @@ const Home = () => {
     const [loginBtn, setLoginBtn] = useState(false);
 
     const {data:user,error,mutate}=useSwr("getusers",getUsers,{revalidateOnFocus:false});
+   
+   
     return (
         <Box >
             <Box mt="100px" textAlign={"center"}>
