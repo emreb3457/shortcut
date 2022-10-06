@@ -4,10 +4,17 @@ const sendToken = require("../utils/sendToken")
 const status = require('http-status');
 const ErrorHandler = require("../utils/errorHandler");
 const authService = require("../services/auth.service")
-const locationService = require("../services/location.service")
+const locationService = require("../services/location.service");
+const paginate = require("../utils/pagination");
+
 
 exports.getUsers = catchAsyncErrors(async (req, res, next) => {
-    const users = await User.find();
+    const options = {
+        select: 'name',
+        sort: { date: -1 },
+    };
+
+    const users = await paginate(User, "", options)
     res.json({
         status: "true",
         result: users

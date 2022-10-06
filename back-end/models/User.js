@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const paginate = require("mongoose-paginate-v2");
 const userSchema = mongoose.Schema({
 
     name: {
@@ -32,6 +33,12 @@ const userSchema = mongoose.Schema({
         default: Date.now,
     },
 })
+
+paginate.paginate.options = {
+    lean: true,
+    limit: 20,
+};
+userSchema.plugin(paginate);
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {

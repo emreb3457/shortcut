@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "mongoose-paginate-v2": "^1.7.1"
+  }
+}
