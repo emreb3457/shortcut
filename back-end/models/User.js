@@ -37,6 +37,7 @@ const userSchema = mongoose.Schema({
 paginate.paginate.options = {
     lean: true,
     limit: 20,
+    page: 1
 };
 userSchema.plugin(paginate);
 

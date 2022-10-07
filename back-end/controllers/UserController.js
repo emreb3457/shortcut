@@ -9,12 +9,16 @@ const paginate = require("../utils/pagination");
 
 
 exports.getUsers = catchAsyncErrors(async (req, res, next) => {
-    const options = {
-        select: 'name',
-        sort: { date: -1 },
+    const { page, limit, keyword } = req.query;
+    const searchField = ["name", "email"];
+    const query = {
+        keyword
     };
-
-    const users = await paginate(User, "", options)
+    const options = {
+        page,
+        limit,
+    };
+    const users = await paginate(User, query, options, searchField)
     res.json({
         status: "true",
         result: users
